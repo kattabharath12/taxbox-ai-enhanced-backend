@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# Install system dependencies for OCR
+# Install system dependencies for OCR and build tools
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-eng \
@@ -14,9 +14,15 @@ RUN apt-get update && apt-get install -y \
     poppler-utils \
     libpq-dev \
     gcc \
+    g++ \
+    build-essential \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
+# Upgrade pip and install setuptools first
+RUN pip install --upgrade pip setuptools wheel
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
