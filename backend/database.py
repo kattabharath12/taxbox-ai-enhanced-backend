@@ -3,8 +3,16 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-# Database URL - using SQLite for simplicity
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./taxbox.db")
+# Railway provides DATABASE_URL for PostgreSQL
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Fallback to SQLite for local development
+if not SQLALCHEMY_DATABASE_URL:
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./taxbox.db"
+
+# Handle Railway's PostgreSQL URL format
+if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
+    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, 
