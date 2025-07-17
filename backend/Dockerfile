@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
     libgomp1 \
     libglib2.0-0 \
     poppler-utils \
+    libpq-dev \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -26,8 +28,9 @@ COPY . .
 # Create uploads directory
 RUN mkdir -p uploads
 
-# Expose port
-EXPOSE 8000
+# Use Railway's PORT environment variable
+ENV PORT=8000
+EXPOSE $PORT
 
 # Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
