@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from typing import Optional, List
-import jwt
+from jose import jwt
 from passlib.context import CryptContext
 import uvicorn
 import os
