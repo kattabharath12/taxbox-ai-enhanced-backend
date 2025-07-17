@@ -3,21 +3,25 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-# Railway provides DATABASE_URL for PostgreSQL
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+# Get database URL from Railway
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Fallback to SQLite for local development
-if not SQLALCHEMY_DATABASE_URL:
-    SQLALCHEMY_DATABASE_URL = "sqlite:///./taxbox.db"
+# If no DATABASE_URL, use SQLite for local development
+if not DATABASE_URL:
+    DATABASE_URL = "sqlite:///./taxbox.db"
 
-# Handle Railway's PostgreSQL URL format
-if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
-    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
+# Fix Railway PostgreSQL URL format
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, 
-    connect_args={"check_same_thread": False} if "sqlite" in SQLALCHEMY_DATABASE_URL else {}
-)
+# Create engine with appropriate settings
+if "postgresql://" in DATABASE_URL:
+    engine = create_engine(DATABASE_URL)
+else:
+    engine = create_engine(
+        DATABASE_URL, 
+        connect_args={"check_same_thread": False}
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
